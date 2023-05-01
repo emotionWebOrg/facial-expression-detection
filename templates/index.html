@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Video Feed</title>
+    <link rel="stylesheet" href="./styles.css" defer>
+    <!-- <script src="script.js" defer></script> -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        :root {
+            --btn-start: #4bbb3e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            
+        }
+        
+                h2 {
+                    color: #fff;
+                    text-align: center;
+                    padding: 1.8rem;
+                    padding-bottom: 1rem;
+                }
+
+        body {
+            height: 100vh;
+            background-color: #24252a;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container {
+            min-height: 65vh;
+            
+        }
+
+        .videoWindow {
+            width: 50%;
+            margin-bottom: 2rem;
+        }
+
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-container {
+            gap: 2rem;
+        }
+
+        .btn {
+            padding-left: 33px;
+            padding-right: 33px;
+            padding-bottom: 16px;
+            padding-top: 16px;
+            border-radius: 7px;
+            background: var(--btn-start);
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.4s;
+            color: #000;
+            padding: 0.7rem 2rem;
+            font-size: 1.1em;
+        }
+
+        .btn:hover {
+            box-shadow: 7px 5px 56px -14px #C3D900;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 7px 5px 56px -10px #C3D900;
+        }
+
+        .btn a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        .webcam {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+    <script type="text/javascript">
+        function startVideoFeed() {
+            const button = document.querySelector('#start-button');
+            const video = document.querySelector('#video-feed');
+
+            // button.disabled = true;
+
+            fetch('/video_feed')
+                .then(response => {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+
+                    let buffer = '';
+                    let boundaryIndex = -1;
+
+                    reader.read().then(function processResult(result) {
+                        if (result.done) {
+                            return;
+                        }
+
+                        buffer += decoder.decode(result.value, { stream: true });
+
+                        boundaryIndex = buffer.indexOf('\r\n--frame\r\n');
+                        if (boundaryIndex !== -1) {
+                            const videoData = buffer.substring(0, boundaryIndex);
+                            buffer = buffer.substring(boundaryIndex + '\r\n--frame\r\n'.length);
+                            video.src = "{{ url_for('video_feed') }}"
+                        }
+
+                        return reader.read().then(processResult);
+                    });
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <main class="container">
+        <h2>Emotion Web</h2>
+        <div class="flex video-container">
+            <img class="videoWindow" id="video-feed">
+        </div>
+        <div class="flex btn-container">
+            <div class="flex">
+                <button class="btn" id="start-button" onclick="startVideoFeed()">Start</button>
+                <!-- <button id="start-button" onclick="startVideoFeed()">Start</button> -->
+            </div>
+            <div class="flex">
+                <button class="btn">
+                    <a href="/table"> Recommendations</a>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+
+</html>

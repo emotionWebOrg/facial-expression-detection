@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <style>
+         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+         th{
+            text-align: center;
+         }
+        body{
+            min-height: 100vh;
+            background-color: #24252a;
+            color: #fff;
+        }
+        .table-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="table-container">
+        <div align="center">
+            <table>
+                <h1>
+                    <!--Displaying the converted table-->
+                    {% for table in tables %}
+                    <h2>{{titles[loop.index]}}</h2>
+                    {{ table|safe }}
+                    {% endfor %}
+                </h1>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>
